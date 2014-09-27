@@ -10,6 +10,10 @@
 #import "MyoObjectiveC.h"
 #import "MIDIWrapper.h"
 
+MIDIWrapper *midi;
+MIDIDeviceRef virtualDevice;
+NSArray *command1;
+NSArray *command2;
 
 @implementation AppDelegate
 
@@ -29,19 +33,19 @@
     
     
     // Insert code here to initialize your application
-    MIDIWrapper *midi = [[MIDIWrapper alloc] initWithClientName:@"Client" inPort:@"Input Port" outPort:@"Output Port"];
+    midi = [[MIDIWrapper alloc] initWithClientName:@"Client" inPort:@"Input Port" outPort:@"Output Port"];
     NSLog(@"%@", [midi getDeviceList]);
     
-    MIDIDeviceRef virtualDevice = [midi getDevice:@"IAC Driver"];
+    virtualDevice = [midi getDevice:@"IAC Driver"];
     
     [midi connectDevice: virtualDevice];
     
-    NSArray *command1 = [NSArray arrayWithObjects:[NSNumber numberWithUnsignedInt:0x90], [NSNumber numberWithUnsignedInt:0x21], [NSNumber numberWithUnsignedInt:127],nil];
+    command1 = [NSArray arrayWithObjects:[NSNumber numberWithUnsignedInt:0x90], [NSNumber numberWithUnsignedInt:0x21], [NSNumber numberWithUnsignedInt:127],nil];
     
-    NSArray *command2 = [NSArray arrayWithObjects:[NSNumber numberWithUnsignedInt:0x80], [NSNumber numberWithUnsignedInt:0x21], [NSNumber numberWithUnsignedInt:127],nil];
+    command2 = [NSArray arrayWithObjects:[NSNumber numberWithUnsignedInt:0x90], [NSNumber numberWithUnsignedInt:0x22], [NSNumber numberWithUnsignedInt:127],nil];
     
     
-    [midi sendData: command1 withDevice: virtualDevice];
+//    [midi sendData: command1 withDevice: virtualDevice];
     
     
 }
@@ -76,10 +80,17 @@
 }
 -(void)myo:(Myo *)myo onOrientationDataWithRoll:(int)roll pitch:(int)pitch yaw:(int)yaw
 {
-    _roll_w = roll;
+    _roll_w = (roll-5)/15.0 * 127 * 2;
+    if(_roll_w > 127)
+        _roll_w = 127;
     _pitch_w = pitch;
     _yaw_w = yaw;
-    //NSLog(@"Myo on orientation data, pull : %d", roll);
+    NSLog(@"Myo on orientation data, pull : %d", _roll_w);
+    NSArray *rolling = [NSArray arrayWithObjects:[NSNumber numberWithUnsignedInt:0xE0 ], [NSNumber numberWithUnsignedInt:0x0C], [NSNumber numberWithUnsignedInt:_roll_w],nil];
+    
+    [midi sendData:rolling withDevice:virtualDevice];
+//    [NSThread sleepForTimeInterval:0.5];
+    
     
 }
 -(void)myo:(Myo *)myo onRssi:(int8_t)rssi
@@ -91,6 +102,16 @@
     _poseType = pose.poseType;
     
     NSLog(@"posed : %u",_poseType);
+    switch (_poseType) {
+        case 3:
+            NSLog(@"Im int");
+            [midi sendData: command1 withDevice: virtualDevice];
+            break;
+        case 4:
+           [midi sendData: command2 withDevice: virtualDevice];
+        default:
+            break;
+    }
 }
 
 @end
