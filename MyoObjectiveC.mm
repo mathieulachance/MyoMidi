@@ -30,9 +30,10 @@ public:
                           1.0f - 2.0f * (quat.y() * quat.y() + quat.z() * quat.z()));
         
         // Convert the floating point angles in radians to a scale from 0 to 20.
-        roll_w = static_cast<int>((roll + (float)M_PI)/(M_PI * 2.0f) * 18);
-        pitch_w = static_cast<int>((pitch + (float)M_PI/2.0f)/M_PI * 18);
-        yaw_w = static_cast<int>((yaw + (float)M_PI)/(M_PI * 2.0f) * 18);
+        //roll_w = static_cast<int>((roll + (float)M_PI)/(M_PI * 2.0f) * 18);
+        roll_w =roll*1000;
+        pitch_w = pitch*1000;
+        yaw_w = yaw*1000;
         
             if ([_myo.delegate respondsToSelector:@selector(myo:onOrientationDataWithRoll:pitch:yaw:)]) {
                 [_myo.delegate myo:_myo onOrientationDataWithRoll:roll_w pitch:pitch_w yaw:yaw_w];
@@ -68,7 +69,7 @@ public:
     void onPose(myo::Myo* myo, uint64_t timestamp, myo::Pose pose)
     {
         currentPose = pose;
-//        print();
+
         MyoPose *myopose = [MyoPose new];
         if (pose.type() == myo::Pose::fist)
             myopose.poseType = MyoPoseTypeFist;
@@ -149,7 +150,7 @@ public:
     myo::Arm whichArm;
     
     // These values are set by onOrientationData() and onPose() above.
-    int roll_w, pitch_w, yaw_w;
+    float roll_w, pitch_w, yaw_w;
     myo::Pose currentPose;
     Myo *_myo;
 };

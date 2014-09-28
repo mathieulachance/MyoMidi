@@ -80,18 +80,28 @@ NSArray *command2;
 }
 -(void)myo:(Myo *)myo onOrientationDataWithRoll:(int)roll pitch:(int)pitch yaw:(int)yaw
 {
-    _roll_w = (roll-5)/15.0 * 127 * 2;
+    _roll_w = (roll + 1250)/2000.0 * 127;
+    if(_roll_w < 0)
+        _roll_w = 0;
     if(_roll_w > 127)
         _roll_w = 127;
-    _pitch_w = pitch;
-    _yaw_w = yaw;
-    NSLog(@"Myo on orientation data, pull : %d", _roll_w);
+    
+    _pitch_w = (pitch + 2000)/2000.0 * 127;
+    if(_pitch_w < 0)
+        _pitch_w = 0;
+    if(_pitch_w > 127)
+        _pitch_w = 127;
+    
+    _yaw_w = (yaw + 2000)/2000.0 *127;
+    if(_yaw_w < 0)
+        _yaw_w = 0;
+    else if(_yaw_w > 127)
+        _yaw_w = 127;
+    
+    NSLog(@"Myo on orientation data, pull : %d, pitch : %d, yaw : %d", _roll_w, _pitch_w, _yaw_w);
     NSArray *rolling = [NSArray arrayWithObjects:[NSNumber numberWithUnsignedInt:0xE0 ], [NSNumber numberWithUnsignedInt:0x0C], [NSNumber numberWithUnsignedInt:_roll_w],nil];
     
     [midi sendData:rolling withDevice:virtualDevice];
-//    [NSThread sleepForTimeInterval:0.5];
-    
-    
 }
 -(void)myo:(Myo *)myo onRssi:(int8_t)rssi
 {

@@ -18,4 +18,6 @@
 
 @property (nonatomic)MyoPoseType poseType;
 
+@property (nonatomic)Myo *myo;
+
 @end
