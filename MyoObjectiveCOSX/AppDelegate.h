@@ -15,6 +15,9 @@
 @property (nonatomic, assign)int roll_w;
 @property (nonatomic, assign)int pitch_w;
 @property (nonatomic, assign)int yaw_w;
+@property (nonatomic, assign)int last_yaw;
+@property (nonatomic, assign)int yaw_withDiff;
+@property (nonatomic, assign)int yaw_myo;
 
 @property (nonatomic)MyoPoseType poseType;
 

@@ -21,6 +21,8 @@ NSInteger *mode = 0;
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification
 {
+    _yaw_w = 63;
+    
     // Insert code here to initialize your application
     
     Myo *newMyo = [[Myo alloc] initWithApplicationIdentifier:@"com.example.myoobjc"];
@@ -87,15 +89,21 @@ NSInteger *mode = 0;
     else if(_pitch_w > 127)
         _pitch_w = 127;
     
-    _yaw_w = 127 - 1.25 * (yaw+1250) / 2000.0 * 127;
+    
+    
+    _yaw_myo = 127 - 1.25 * (yaw+1250) / 2000.0 * 127;
+    
+    int yaw_diff=_last_yaw - _yaw_myo;
+    _yaw_w = _yaw_w - yaw_diff;
+    _last_yaw = _yaw_myo;
+    
     if(_yaw_w > 127)
         _yaw_w = 127;
     else if(_yaw_w < 0)
         _yaw_w = 0;
     
-    
     NSLog(@"Myo on orientation data, pull : %d, pitch : %d, yaw : %d", _roll_w, _pitch_w, _yaw_w);
-    if(mode == 0)
+    if(_mode == 0)
             rolling = [NSArray arrayWithObjects:[NSNumber numberWithUnsignedInt:0xE0 ], [NSNumber numberWithUnsignedInt:0x0C], [NSNumber numberWithUnsignedInt:_yaw_w],nil];
 //    if(mode == 4)
 //            rolling = [NSArray arrayWithObjects:[NSNumber numberWithUnsignedInt:0xE0 ], [NSNumber numberWithUnsignedInt:0x0C], [NSNumber numberWithUnsignedInt:_roll_w],nil];
