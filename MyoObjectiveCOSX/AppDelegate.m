@@ -74,14 +74,27 @@ NSInteger *mode = 0;
 }
 -(void)myo:(Myo *)myo onOrientationDataWithRoll:(int)roll pitch:(int)pitch yaw:(int)yaw
 {
-    _roll_w = (roll+2000)/3000.0 * 127;
-    _pitch_w = pitch;
-    _yaw_w = 127 - 1.25 *(yaw+2000) / 3000.0 * 127;
+    _roll_w = 127 - (roll+1000)/2000.0 * 127;
+    if(_roll_w < 0)
+        _roll_w = 0;
+    else if(_roll_w > 127)
+        _roll_w = 127;
+    
+    
+    _pitch_w = (pitch+1250)/2000.0 * 127;
+    if(_pitch_w < 0)
+        _pitch_w = 0;
+    else if(_pitch_w > 127)
+        _pitch_w = 127;
+    
+    _yaw_w = 127 - 1.25 * (yaw+1250) / 2000.0 * 127;
     if(_yaw_w > 127)
         _yaw_w = 127;
-    if(_yaw_w < 0)
+    else if(_yaw_w < 0)
         _yaw_w = 0;
-    NSLog(@"Myo on orientation data, pull : %d", _yaw_w);
+    
+    
+    NSLog(@"Myo on orientation data, pull : %d, pitch : %d, yaw : %d", _roll_w, _pitch_w, _yaw_w);
     if(mode == 0)
             rolling = [NSArray arrayWithObjects:[NSNumber numberWithUnsignedInt:0xE0 ], [NSNumber numberWithUnsignedInt:0x0C], [NSNumber numberWithUnsignedInt:_yaw_w],nil];
 //    if(mode == 4)
@@ -107,22 +120,22 @@ NSInteger *mode = 0;
     NSLog(@"posed : %u",_poseType);
     switch (_poseType) {
         case 0 :
-            mode = 0;
+            _mode = 0;
             break;
         case 1:
-            mode = 1;
+            _mode = 1;
             break;
             case 2:
-            mode = 2;
+            _mode = 2;
             break;
         case 3:
-            mode = 3;
+            _mode = 3;
             break;
         case 4:
-            mode = 4;
+            _mode = 4;
             break;
         case 5:
-            mode = 5;
+            _mode = 5;
             break;
         default:
             break;
